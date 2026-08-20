@@ -1,5 +1,10 @@
 # Substitute
 
+**Live demo:** [cognodb-recipe-graph.vercel.app](https://cognodb-recipe-graph.vercel.app)
+*(deployed before a production CognoDB instance was provisioned — see [Deployment](#deployment)
+for the one-time step to point it at a live database; until then it correctly shows the
+graceful "can't reach CognoDB" state described below.)*
+
 A recipe and ingredient explorer where the interesting feature — tracing a chain of
 substitutions to work around what's missing from your kitchen or what you're allergic to —
 only makes sense because the data is a graph. Built on **CognoDB** (openCypher over Bolt) with
@@ -238,16 +243,27 @@ scripts/seed.ts                 loads seed-data.ts into CognoDB
 
 ## Deployment
 
-The app is deployed on Vercel's free tier: **[add your live URL here after deploying]**.
+Live at **[cognodb-recipe-graph.vercel.app](https://cognodb-recipe-graph.vercel.app)** on
+Vercel's free Hobby tier.
 
-To deploy your own copy:
+The app was deployed before a production CognoDB instance existed, so right now every page
+correctly shows the "can't reach CognoDB" state — that's the graceful-degradation behavior
+described below, not a broken deploy. To make it fully live:
 
-1. Push this repo to GitHub.
-2. Import it into [Vercel](https://vercel.com/new) (free Hobby plan).
-3. Add `COGNODB_URI`, `COGNODB_USER`, `COGNODB_PASSWORD` as environment variables in the Vercel
-   project settings — the same values from your `.env.local`.
-4. Deploy. Run `npm run seed` locally (pointed at the same CognoDB instance) at least once so the
-   deployed app has data to serve.
+1. Provision the CognoDB Cloud instance (see [above](#1-create-a-cognodb-cloud-instance)).
+2. In the Vercel dashboard → this project → **Settings → Environment Variables**, add
+   `COGNODB_URI`, `COGNODB_USER`, `COGNODB_PASSWORD` for the Production environment.
+3. Run `npm run seed` locally with `.env.local` pointed at that same instance, so the graph has
+   data before anyone hits the live URL.
+4. Redeploy (`npx vercel --prod`, or push to `main` once the GitHub integration below is
+   connected).
+
+To deploy your own copy from scratch: push this repo to GitHub, import it at
+[vercel.com/new](https://vercel.com/new), add the three environment variables above, and deploy.
+Vercel's GitHub integration needs to be authorized interactively from the dashboard (Project →
+Settings → Git) to get auto-deploys on push — this repo's Vercel project was created via the CLI
+and isn't linked to GitHub for CI yet, so redeploys until then are `npx vercel --prod` from a
+local checkout.
 
 ## Error handling
 
